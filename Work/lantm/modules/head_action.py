@@ -2,8 +2,9 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
+# The head has new action addresses added into it as well as the lie group interaction
 
-class NTMHead_Action(nn.Module):
+class LANTMHead_Action(nn.Module):
 
     def __init__(self, mode, controller_size, key_size):
         super().__init__()
