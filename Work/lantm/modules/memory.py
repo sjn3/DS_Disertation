@@ -3,16 +3,17 @@ import torch.nn.functional as F
 from torch import nn
 
 
-class NTMMemory(nn.Module):
+# The memory section is very similar to that of the NTM, except for changes in dimensions
 
+class LANTMMemory(nn.Module):
     def __init__(self, memory_units, memory_unit_size):
         super().__init__()
         self.n = memory_units
         self.m = memory_unit_size
-        self.memory = torch.zeros([1, self.n, self.m])
+        self.memory = torch.zeros([self.n, self.n, self.m])
         nn.init.kaiming_uniform_(self.memory)
         # layer to learn bias values for memory reset
-        self.memory_bias_fc = nn.Linear(1, self.n * self.m)
+        self.memory_bias_fc = nn.Linear(1, self.n*self.n * self.m)
         self.reset()
 
     def forward(self, *inputs):
@@ -77,7 +78,7 @@ class NTMMemory(nn.Module):
         # expand and perform batch matrix mutliplication
         
         
-        weights = weights.view(-1, 1, self.n)
+        weights = weights.view(-1, self.n, self.n)
         # (b, 1, self.n) x (b, self.n, self.m) -> (b, 1, self.m)
         data = torch.bmm(weights, self.memory).view(-1, self.m)
         return data
@@ -107,7 +108,7 @@ class NTMMemory(nn.Module):
         """
 
         # make weights and write_data sizes same as memory
-        weights = weights.view(-1, self.n, 1).expand(self.memory.size())
+        weights = weights.view(-1, self.n, self.n).expand(self.memory.size())
         data = data.view(-1, 1, self.m).expand(self.memory.size())
         self.memory = weights * data + (1 - weights) * self.memory
         # --(separate erase and add mechanism)
