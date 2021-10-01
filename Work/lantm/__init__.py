@@ -1,1 +1,1 @@
-from .lantm import NTM
+from .lantm import LANTM
