@@ -2,8 +2,9 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
+# The is no differece between the NTM controller and the LANTM controller
 
-class NTMController(nn.Module):
+class LANTMController(nn.Module):
 
     def __init__(self, input_size, controller_size, output_size, read_data_size):
         super().__init__()
@@ -39,9 +40,11 @@ class NTMController(nn.Module):
         complete_state = torch.cat([self.h_state] + read_data, dim=-1)
         #complete_state = read_data.view(120,8)
         
+        # used the Value Error function to test the different input and output dimensiosn
         #raise ValueError(len((self.out_net.weight[1])))
         
-        
+        # This is the section that caused the issue, I cant find the reason that the out_net refuses to process the data. All dimensions are the same as those in the NTM model
+        # this issue shouldnt be occuring
         holder = self.out_net(complete_state)    #self.out_net(complete_state)
        
         
